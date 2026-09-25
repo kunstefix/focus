@@ -1,0 +1,6 @@
+# Copy this file to sites.txt and list the sites to block, one domain per line.
+# Don't include "www." — both the bare domain and www. variant are blocked.
+# Lines starting with # and blank lines are ignored.
+reddit.com
+x.com
+news.ycombinator.com
