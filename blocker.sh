@@ -17,32 +17,19 @@ if [ ! -f "$1" ]; then
     exit 1
 fi
 
-while IFS= read -r line; do
-    updated_content+="127.0.0.1       www.$line\n"
-    updated_content+="127.0.0.1       $line\n"
-done < "$1"
+base_hosts="$(dirname "$0")/hosts.base"
 
-# Define the new content for /etc/hosts
-new_hosts_content="##
-# Host Database
-#
-# localhost is used to configure the loopback interface
-# when the system is booting.  Do not change this entry.
-##
-127.0.0.1       localhost
-127.0.0.1       wundertax.api
-127.0.0.1       assets.wtx elster.wtx jsonizer.wtx submission.wtx usermandate.wtx usermandate-2.wtx app.wtx merger.wtx wundertax--de.local.wundertax.green germantaxes--de.local.wundertax.green studentensteuererklaerung--de.local.wundertax.green
-$updated_content
-
-255.255.255.255 broadcasthost
-::1             localhost
-# Added by Docker Desktop
-# To allow the same kube context to work on the host and the container:
-127.0.0.1 kubernetes.docker.internal
-# End of section"
-
-# Overwrite /etc/hosts with the new content
-echo "$new_hosts_content" > /etc/hosts
+# Overwrite /etc/hosts with the base content followed by the blocked sites
+{
+    cat "$base_hosts"
+    echo
+    echo "# Blocked sites"
+    while IFS= read -r line || [ -n "$line" ]; do
+        [ -z "$line" ] && continue
+        printf '127.0.0.1       www.%s\n' "$line"
+        printf '127.0.0.1       %s\n' "$line"
+    done < "$1"
+} > /etc/hosts
 
 echo "The /etc/hosts file has been updated."
 
