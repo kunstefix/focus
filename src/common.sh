@@ -1,7 +1,7 @@
 # Shared by focus.sh and unfocus.sh. Expects SCRIPT_DIR to be set.
 
 HOSTS_FILE="/etc/hosts"
-PID_FILE="/var/run/website-blocker.pid"
+PID_FILE="/var/run/focus.pid"
 BASE_HOSTS="$SCRIPT_DIR/hosts.base"
 
 require_root() {

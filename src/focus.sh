@@ -1,5 +1,5 @@
 #!/bin/bash
-# Block every site in the sites file (default: sites.txt next to this script).
+# Block every site in the sites file (default: sites.txt in the repo root).
 # Usage: focus.sh [sites-file]
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -7,7 +7,7 @@ source "$SCRIPT_DIR/common.sh"
 
 require_root
 
-sites_file="${1:-$SCRIPT_DIR/sites.txt}"
+sites_file="${1:-$(dirname "$SCRIPT_DIR")/sites.txt}"
 if [ ! -f "$sites_file" ]; then
     echo "Error: File '$sites_file' not found!"
     echo "Create it with: cp sites.example.txt sites.txt"

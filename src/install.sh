@@ -1,11 +1,12 @@
 #!/bin/bash
 # Install a LaunchDaemon that runs focus.sh at every boot, then focus immediately.
 
-LIB_DIR="/usr/local/lib/website-blocker"
-LABEL="com.klemen.website-blocker"
+LIB_DIR="/usr/local/lib/focus"
+LABEL="com.klemen.focus"
 PLIST="/Library/LaunchDaemons/$LABEL.plist"
 
-REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_DIR="$(dirname "$SCRIPT_DIR")"
 SITES_FILE="$REPO_DIR/sites.txt"
 
 if [ "$EUID" -ne 0 ]; then
@@ -22,7 +23,7 @@ fi
 # The daemon runs as root, so it runs root-owned copies rather than the
 # user-writable scripts in the repo. The sites list is still read from the repo.
 mkdir -p "$LIB_DIR"
-cp "$REPO_DIR/focus.sh" "$REPO_DIR/common.sh" "$REPO_DIR/hosts.base" "$LIB_DIR/"
+cp "$SCRIPT_DIR/focus.sh" "$SCRIPT_DIR/common.sh" "$SCRIPT_DIR/hosts.base" "$LIB_DIR/"
 chown -R root:wheel "$LIB_DIR"
 chmod 755 "$LIB_DIR" "$LIB_DIR/focus.sh"
 chmod 644 "$LIB_DIR/common.sh" "$LIB_DIR/hosts.base"
