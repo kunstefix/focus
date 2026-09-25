@@ -34,8 +34,9 @@ deadline=$(( $(date +%s) + minutes * 60 ))
 nohup bash -c '
     while [ "$(date +%s)" -lt "$1" ]; do sleep 5; done
     rm -f "$2"
-    exec "$3"
-' _ "$deadline" "$PID_FILE" "$SCRIPT_DIR/focus.sh" >/dev/null 2>&1 &
+    "$3/focus.sh"
+    exec "$3/restart-chrome.sh" "$4"
+' _ "$deadline" "$PID_FILE" "$SCRIPT_DIR" "$SUDO_USER" >/dev/null 2>&1 &
 echo $! > "$PID_FILE"
 
 echo "Focus off: sites are unblocked until $(date -r "$deadline" +%H:%M)."

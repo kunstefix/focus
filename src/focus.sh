@@ -24,8 +24,11 @@ cancel_timer
     echo "# Blocked sites"
     while IFS= read -r line || [ -n "$line" ]; do
         case "$line" in ''|\#*) continue ;; esac
+        # Block IPv6 too, or the real AAAA record still resolves
         printf '127.0.0.1       www.%s\n' "$line"
         printf '127.0.0.1       %s\n' "$line"
+        printf '::1             www.%s\n' "$line"
+        printf '::1             %s\n' "$line"
     done < "$sites_file"
 } > "$HOSTS_FILE"
 

@@ -69,5 +69,5 @@ This removes the boot job and unblocks all sites.
 
 - `/etc/hosts` is **overwritten** each time. It's rebuilt from `src/hosts.base` plus your blocked sites, so put any permanent custom host entries in `src/hosts.base`.
 - `src/install.sh` copies `focus.sh`, `common.sh` and `hosts.base` to `/usr/local/lib/focus/` for the boot job. It reads `sites.txt` from the repo root. Re-run `sudo ./src/install.sh` after editing those scripts or `hosts.base`, and after moving this folder.
-- Browsers keep their own DNS cache, so a tab that's already open may need a reload, or a browser restart, before the change shows.
+- Blocking only affects new connections. A tab that's already open on a blocked site (e.g. Instagram or X) keeps working over its existing connection. To close that gap, **Chrome restarts itself when a break ends**, then restores your tabs, and the blocked ones fail to reconnect. If a page shows a "Leave site?" dialog, the restart is skipped. Other browsers aren't restarted, so close blocked tabs yourself. Running `focus` manually doesn't restart Chrome either.
 
