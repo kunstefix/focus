@@ -20,18 +20,18 @@ In `sites.txt`, put one domain per line without `www.`. Both `example.com` and `
 ## Usage
 
 ```bash
-sudo ./src/unfocus.sh         # unblock for 5 minutes
-sudo ./src/unfocus.sh -m 15   # unblock for 15 minutes
-sudo ./src/focus.sh           # block again right away (cancels a running break)
+./src/unfocus.sh         # unblock for 5 minutes
+./src/unfocus.sh -m 15   # unblock for 15 minutes
+./src/focus.sh           # block again right away (cancels a running break)
 ```
 
-When the break is over, sites are blocked again in the background with no password prompt. Time the Mac spends asleep counts toward the break, and a reboot ends it.
+`unfocus` always asks for your password, even if you've used sudo recently. Don't run it with `sudo` in front, because a cached sudo login would skip the prompt. `focus` asks only when sudo needs it. When the break is over, sites are blocked again in the background with no password prompt. Time the Mac spends asleep counts toward the break, and a reboot ends it.
 
 ### Adding or removing sites
 
 Edit `sites.txt`. You don't need to reinstall. The change takes effect the next time `focus.sh` runs:
 
-- **Right away:** run `sudo ./src/focus.sh` (or `focus` if you set up the alias). Do this if sites are currently blocked.
+- **Right away:** run `./src/focus.sh` (or `focus` if you set up the alias). Do this if sites are currently blocked.
 - **At the end of a break:** if you're in an `unfocus` break, the timer applies the new list when it re-blocks.
 - **At the next boot.**
 
@@ -42,8 +42,8 @@ Re-run `sudo ./src/install.sh` only after changing the scripts or `hosts.base`.
 To run `focus` and `unfocus` from anywhere, add aliases to your shell config. Run this from the project folder:
 
 ```bash
-echo "alias focus='sudo $PWD/src/focus.sh'" >> ~/.zshrc
-echo "alias unfocus='sudo $PWD/src/unfocus.sh'" >> ~/.zshrc
+echo "alias focus='$PWD/src/focus.sh'" >> ~/.zshrc
+echo "alias unfocus='$PWD/src/unfocus.sh'" >> ~/.zshrc
 source ~/.zshrc
 ```
 

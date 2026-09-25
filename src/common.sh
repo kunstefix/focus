@@ -4,13 +4,6 @@ HOSTS_FILE="/etc/hosts"
 PID_FILE="/var/run/focus.pid"
 BASE_HOSTS="$SCRIPT_DIR/hosts.base"
 
-require_root() {
-    if [ "$EUID" -ne 0 ]; then
-        echo "Please run this script as root."
-        exit 1
-    fi
-}
-
 # Kill a pending re-focus timer started by unfocus.sh, if any
 cancel_timer() {
     if [ -f "$PID_FILE" ]; then

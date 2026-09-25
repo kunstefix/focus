@@ -18,7 +18,9 @@ if ! [[ "$minutes" =~ ^[1-9][0-9]*$ ]]; then
     exit 1
 fi
 
-require_root
+# Re-run as root, always asking for the password: -k ignores sudo's cached
+# credentials, so a recent sudo doesn't let a break start without a prompt.
+[ "$EUID" -eq 0 ] || exec sudo -k "$0" "$@"
 
 # A second unfocus restarts the countdown
 cancel_timer

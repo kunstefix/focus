@@ -2,10 +2,11 @@
 # Block every site in the sites file (default: sites.txt in the repo root).
 # Usage: focus.sh [sites-file]
 
+# Re-run as root (a cached sudo password is fine here)
+[ "$EUID" -eq 0 ] || exec sudo "$0" "$@"
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
-
-require_root
 
 sites_file="${1:-$(dirname "$SCRIPT_DIR")/sites.txt}"
 if [ ! -f "$sites_file" ]; then
