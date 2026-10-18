@@ -1,2 +1,4 @@
 .DS_Store
 sites.txt
+dist/
+app/.build/

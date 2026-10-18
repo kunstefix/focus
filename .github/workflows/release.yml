@@ -1,0 +1,19 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift test --package-path app
+      - run: scripts/build-app.sh "$GITHUB_REF_NAME"
+      - run: gh release create "$GITHUB_REF_NAME" dist/Focus.dmg --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}
