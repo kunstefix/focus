@@ -9,7 +9,7 @@ enum Privileged {
     struct Cancelled: Error {}
 
     static func startBreak(minutes: Int) async throws {
-        // Under osascript SUDO_USER isn't set; unfocus.sh needs the user to restart Chrome as
+        // Under osascript SUDO_USER isn't set; unfocus.sh needs the user to restart their browser as
         try await runAsAdmin("FOCUS_USER=\(quote(NSUserName())) \(quote(Paths.libDir + "/unfocus.sh")) -m \(minutes)")
     }
 

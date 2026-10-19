@@ -3,7 +3,7 @@ import Foundation
 /// Opens the app at login through a LaunchAgent. SMAppService.mainApp is the
 /// modern way, but it isn't reliable for an ad-hoc signed app.
 enum LoginItem {
-    private static let label = "com.klemen.focus.app"
+    private static let label = "io.github.kunstefix.focus.app"
 
     private static var plist: URL {
         FileManager.default.homeDirectoryForCurrentUser
@@ -21,7 +21,7 @@ enum LoginItem {
         }
         let contents: [String: Any] = [
             "Label": label,
-            "ProgramArguments": [Bundle.main.executablePath ?? ""],
+            "ProgramArguments": [Bundle.main.executablePath ?? "", AppDelegate.loginArgument],
             "RunAtLoad": true,
         ]
         let data = try PropertyListSerialization.data(fromPropertyList: contents, format: .xml, options: 0)

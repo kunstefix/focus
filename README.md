@@ -2,6 +2,8 @@
 
 Block distracting websites on macOS by pointing them at `127.0.0.1` in `/etc/hosts`.
 
+**Website:** [kunstefix.github.io/focus](https://kunstefix.github.io/focus/)
+
 Sites stay blocked by default. They're blocked again at every boot. You can take a short break from the menu bar (or with `unfocus`), and the block comes back on its own when the time is up. The menu bar shows how much time you've spent on breaks today.
 
 ## Why it works
@@ -19,7 +21,7 @@ Checking a site is usually a habit, not a decision. Focus puts a little friction
 ### Use
 
 - **Take a break:** pick 5, 10 or 15 minutes, or set your own. macOS asks for your password every time, on purpose.
-- **End break now:** blocks again right away, without a password.
+- **End break now:** blocks again right away, without a password. Your browser restarts, as it does when a break runs out.
 - **Edit sites…:** one domain per line, without `www.`. Both `example.com` and `www.example.com` get blocked. Lines starting with `#` are comments. Saving applies the list right away; during a break it applies when the break ends. The list lives in `~/Library/Application Support/Focus/sites.txt`.
 - **Open at login** keeps the menu bar icon around. Blocking doesn't depend on it: that runs at boot whether the app is open or not.
 - **Today on breaks** adds up every break since midnight, including breaks started from the command line. A break you end early only counts until you ended it.
@@ -63,7 +65,7 @@ source ~/.zshrc
 ## Notes
 
 - Focus only touches the lines between `# BEGIN focus` and `# END focus` in `/etc/hosts`. Your own entries outside that block are kept.
-- Install puts root-owned copies of the scripts in `/Library/PrivilegedHelperTools/com.klemen.focus/`, adds a LaunchDaemon that blocks at boot, and adds `/etc/sudoers.d/focus` so ending a break needs no password. Re-run install after changing the scripts.
+- Install puts root-owned copies of the scripts in `/Library/PrivilegedHelperTools/io.github.kunstefix.focus/`, adds a LaunchDaemon that blocks at boot and ends breaks on time, and adds `/etc/sudoers.d/focus` so ending a break needs no password. Re-run install after changing the scripts.
 - The break history is in `/var/db/focus/breaks.log`. Uninstall keeps it.
-- Blocking only affects new connections. A tab that's already open on a blocked site (e.g. Instagram or X) keeps working over its existing connection. To close that gap, **Chrome restarts itself when a break ends**, then restores your tabs, and the blocked ones fail to reconnect. If a page shows a "Leave site?" dialog, the restart is skipped. Other browsers aren't restarted, so close blocked tabs yourself. Ending a break early doesn't restart Chrome either.
+- Blocking only affects new connections. A tab that's already open on a blocked site (e.g. Instagram or X) keeps working over its existing connection. To close that gap, **your default browser restarts when a break ends**, and the blocked tabs fail to reconnect. This also happens when you end a break early. If a page shows a "Leave site?" dialog, the restart is skipped. Chrome, Arc, Brave, Edge, Vivaldi and Opera always restore your tabs. Safari and Firefox reopen them only if they're set to; otherwise use History → Reopen All Windows from Last Session (Safari) or Restore Previous Session (Firefox). Browsers other than the default aren't restarted.
 - The sites list is yours to edit, so emptying it unblocks everything without a password. Focus adds friction; it isn't a lock you can't open.

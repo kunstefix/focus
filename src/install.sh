@@ -1,9 +1,10 @@
 #!/bin/bash
-# Install the scripts and a LaunchDaemon that runs focus.sh at every boot, then focus immediately.
+# Install the scripts and the LaunchDaemon (focusd.sh), which blocks at boot and ends breaks.
 # Usage: sudo install.sh [sites-file]   (default: sites.txt in the repo root)
 
-LABEL="com.klemen.focus"
+LABEL="io.github.kunstefix.focus"
 PLIST="/Library/LaunchDaemons/$LABEL.plist"
+LEGACY_LABEL="com.klemen.focus"  # label before the rename
 SUDOERS_FILE="/etc/sudoers.d/focus"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -26,11 +27,11 @@ sites_file="$(cd "$(dirname "$sites_file")" && pwd)/$(basename "$sites_file")"
 # repo or app bundle. The sites list is still read from where the user keeps it.
 rm -rf /usr/local/lib/focus  # location used before the app existed
 mkdir -p "$LIB_DIR"
-cp "$SCRIPT_DIR/focus.sh" "$SCRIPT_DIR/unfocus.sh" "$SCRIPT_DIR/restart-chrome.sh" \
-    "$SCRIPT_DIR/common.sh" "$LIB_DIR/"
+cp "$SCRIPT_DIR/focus.sh" "$SCRIPT_DIR/focusd.sh" "$SCRIPT_DIR/unfocus.sh" \
+    "$SCRIPT_DIR/restart-browser.sh" "$SCRIPT_DIR/common.sh" "$LIB_DIR/"
 printf 'SITES_FILE=%q\n' "$sites_file" > "$CONFIG_FILE"
 chown -R root:wheel "$LIB_DIR"
-chmod 755 "$LIB_DIR" "$LIB_DIR/focus.sh" "$LIB_DIR/unfocus.sh" "$LIB_DIR/restart-chrome.sh"
+chmod 755 "$LIB_DIR" "$LIB_DIR/focus.sh" "$LIB_DIR/focusd.sh" "$LIB_DIR/unfocus.sh" "$LIB_DIR/restart-browser.sh"
 chmod 644 "$LIB_DIR/common.sh" "$CONFIG_FILE"
 
 # Ending a break needs no password, so the app can do it without a prompt.
@@ -59,9 +60,11 @@ cat > "$PLIST" <<PLIST
     <string>$LABEL</string>
     <key>ProgramArguments</key>
     <array>
-        <string>$LIB_DIR/focus.sh</string>
+        <string>$LIB_DIR/focusd.sh</string>
     </array>
     <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
     <true/>
 </dict>
 </plist>
@@ -75,9 +78,17 @@ if ! grep -qx "$BLOCK_BEGIN" "$HOSTS_FILE" && grep -qx "# Blocked sites" "$HOSTS
     sed '/^# Blocked sites$/,$d' "$HOSTS_FILE" | replace_hosts
 fi
 
+# The daemon and scripts installed under the old label
+launchctl bootout "system/$LEGACY_LABEL" 2>/dev/null
+rm -f "/Library/LaunchDaemons/$LEGACY_LABEL.plist"
+rm -rf "/Library/PrivilegedHelperTools/$LEGACY_LABEL"
+
+# Timers from before focusd.sh existed
+[ -f /var/run/focus.pid ] && kill "$(cat /var/run/focus.pid)" 2>/dev/null
+rm -f /var/run/focus.pid
+
+# Starting focusd.sh blocks right away
 launchctl bootout "system/$LABEL" 2>/dev/null
 launchctl bootstrap system "$PLIST"
 
-"$LIB_DIR/focus.sh"
-
-echo "Installed: sites will be blocked at every boot."
+echo "Installed: sites are blocked now and at every boot."

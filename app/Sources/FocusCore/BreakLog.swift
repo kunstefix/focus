@@ -49,12 +49,20 @@ public enum BreakLog {
         return result
     }
 
+    /// The breaks during the calendar day containing `day`, clipped to that day.
+    public static func intervals(on day: Date, log: String, now: Date, calendar: Calendar = .current) -> [Interval] {
+        let dayStart = calendar.startOfDay(for: day)
+        guard let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart) else { return [] }
+        return intervals(from: log, now: now).compactMap { interval in
+            let start = max(interval.start, dayStart)
+            let end = min(interval.end, dayEnd)
+            return end > start ? Interval(start: start, end: end) : nil
+        }
+    }
+
     /// Seconds spent on breaks during the calendar day containing `day`.
     public static func total(on day: Date, log: String, now: Date, calendar: Calendar = .current) -> TimeInterval {
-        let dayStart = calendar.startOfDay(for: day)
-        guard let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart) else { return 0 }
-        return intervals(from: log, now: now).reduce(0) { sum, interval in
-            sum + max(0, min(interval.end, dayEnd).timeIntervalSince(max(interval.start, dayStart)))
-        }
+        intervals(on: day, log: log, now: now, calendar: calendar)
+            .reduce(0) { $0 + $1.end.timeIntervalSince($1.start) }
     }
 }

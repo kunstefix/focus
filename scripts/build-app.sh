@@ -35,7 +35,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 <plist version="1.0">
 <dict>
     <key>CFBundleIdentifier</key>
-    <string>com.klemen.focus.app</string>
+    <string>io.github.kunstefix.focus.app</string>
     <key>CFBundleName</key>
     <string>Focus</string>
     <key>CFBundleDisplayName</key>

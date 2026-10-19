@@ -22,7 +22,7 @@ if [ ! -f "$sites_file" ]; then
     exit 1
 fi
 
-cancel_timer
+end_break
 
 # Keep everything else in /etc/hosts and append a fresh block of blocked sites
 {
@@ -45,6 +45,12 @@ cancel_timer
 } | replace_hosts
 
 flush_dns
+
+# Hosts changes don't affect the browser's existing connections, so tabs left open
+# on blocked sites would keep working. Restart it in the background.
+if [ -n "$ended_user" ]; then
+    "$SCRIPT_DIR/restart-browser.sh" "$ended_user" >/dev/null 2>&1 &
+fi
 
 echo "Focus on: sites are blocked."
 

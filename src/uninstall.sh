@@ -2,8 +2,9 @@
 # Remove the boot LaunchDaemon, the installed scripts and the sudoers rule, and unblock all sites.
 # The break log in /var/db/focus is kept.
 
-LABEL="com.klemen.focus"
+LABEL="io.github.kunstefix.focus"
 PLIST="/Library/LaunchDaemons/$LABEL.plist"
+LEGACY_LABEL="com.klemen.focus"  # label before the rename
 SUDOERS_FILE="/etc/sudoers.d/focus"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -14,11 +15,15 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-launchctl bootout "system/$LABEL" 2>/dev/null
-rm -f "$PLIST" "$SUDOERS_FILE"
-rm -rf "$LIB_DIR" /usr/local/lib/focus
+for label in "$LABEL" "$LEGACY_LABEL"; do
+    launchctl bootout "system/$label" 2>/dev/null
+    rm -f "/Library/LaunchDaemons/$label.plist"
+    rm -rf "/Library/PrivilegedHelperTools/$label"
+done
+rm -f "$SUDOERS_FILE"
+rm -rf /usr/local/lib/focus
 
-cancel_timer
+end_break
 
 hosts_without_block | replace_hosts
 flush_dns

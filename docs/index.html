@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Focus — stop staring into the Eye</title>
+<meta name="description" content="Focus is a small Mac app that blocks distracting sites. Take a short break when you need one; when it ends, the sites are blocked again.">
+<meta property="og:title" content="Focus — stop staring into the Eye">
+<meta property="og:description" content="A small Mac menu bar app that blocks distracting sites, with breaks that end on their own.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='22' fill='none' stroke='%23D9AE52' stroke-width='9'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --ash: #1E1714;
+    --ash-2: #2A201B;
+    --smoke: #B9A89B;
+    --ember: #F2601B;
+    --flame: #FFB347;
+    --gold: #D9AE52;
+    --gold-deep: #A9802C;
+    --meadow: #ECF1DC;
+    --meadow-2: #DDE6C6;
+    --moss: #2C3A21;
+    --moss-soft: #56653F;
+    --door: #3E6A33;
+
+    --display: "IM Fell English", "Iowan Old Style", Georgia, serif;
+    --body: "Alegreya Sans", "Gill Sans", system-ui, sans-serif;
+    --measure: 34rem;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: var(--body);
+    font-size: 1.1875rem;
+    line-height: 1.55;
+    color: var(--meadow);
+    background: var(--ash);
+    -webkit-font-smoothing: antialiased;
+  }
+  img, svg, iframe { display: block; max-width: 100%; }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 4px; }
+
+  h1, h2, h3 {
+    font-family: var(--display);
+    font-weight: 400;
+    line-height: 1.05;
+    margin: 0;
+    text-wrap: balance;
+  }
+  p { margin: 0; text-wrap: pretty; }
+
+  .wrap { width: min(72rem, 100% - 2.5rem); margin-inline: auto; }
+
+  /* ---------- Buttons ---------- */
+  .button {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .85rem 1.4rem;
+    border-radius: 999px;
+    font: 500 1.0625rem/1 var(--body);
+    text-decoration: none;
+    transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease;
+  }
+  .button svg { width: 1.15em; height: 1.15em; flex: none; }
+  .button:hover { transform: translateY(-1px); }
+  .button-gold {
+    color: #2A1B05;
+    background: linear-gradient(180deg, #F0CF7A, var(--gold) 55%, var(--gold-deep));
+    box-shadow: 0 0 0 1px #F3D78F55 inset, 0 8px 30px -8px #D9AE5299;
+  }
+  .button-gold:hover { box-shadow: 0 0 0 1px #F3D78F88 inset, 0 10px 36px -6px #D9AE52cc; }
+  .button-ghost { color: var(--meadow); box-shadow: 0 0 0 1px #ECF1DC40 inset; }
+  .button-ghost:hover { box-shadow: 0 0 0 1px #ECF1DC90 inset; }
+  .button-door { color: var(--meadow); background: var(--door); }
+  .button-door:hover { background: #47793A; }
+
+  /* ---------- Hero: the Eye ---------- */
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+    padding: 4rem 0 5rem;
+    overflow: hidden;
+    background:
+      radial-gradient(60rem 30rem at 50% 32%, #4A1D0C 0%, transparent 65%),
+      var(--ash);
+  }
+  .hero-inner { text-align: center; display: grid; justify-items: center; gap: 1.6rem; }
+  .eye {
+    width: min(34rem, 88vw);
+    filter: drop-shadow(0 0 60px #F2601B66);
+    animation: smoulder 5s ease-in-out infinite;
+  }
+  @keyframes smoulder {
+    50% { filter: drop-shadow(0 0 90px #F2601B88); }
+  }
+  .pupil { transition: transform .25s ease-out; }
+  .hero h1 {
+    font-size: clamp(3rem, 8vw, 6.25rem);
+    letter-spacing: -.01em;
+    color: #F7EBDD;
+  }
+  .hero .lead {
+    max-width: var(--measure);
+    color: var(--smoke);
+    font-size: 1.25rem;
+  }
+  .actions { display: flex; flex-wrap: wrap; gap: .8rem; justify-content: center; }
+  .fineprint { font-size: .95rem; color: #8F7F73; }
+
+  .brand {
+    position: absolute;
+    top: 1.5rem;
+    left: 50%;
+    translate: -50% 0;
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    font-family: var(--display);
+    font-size: 1.5rem;
+    color: #F7EBDD;
+    text-decoration: none;
+  }
+  .brand svg { width: 1.4rem; height: 1.4rem; }
+
+  /* ---------- Ring on: the video ---------- */
+  .ring-on {
+    background: linear-gradient(180deg, var(--ash) 0%, var(--ash-2) 100%);
+    padding: 6rem 0 7rem;
+  }
+  .ring-on .wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
+    gap: clamp(2.5rem, 7vw, 6rem);
+    align-items: center;
+  }
+  .ring-on h2 { font-size: clamp(2.4rem, 5vw, 3.75rem); color: #F7EBDD; margin-bottom: 1.4rem; }
+  .ring-on p { max-width: var(--measure); color: var(--smoke); }
+  .ring-on p + p { margin-top: 1rem; }
+  .ring-on .pair {
+    margin-top: 2.2rem;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: .7rem 1.1rem;
+    max-width: var(--measure);
+    font-size: 1.0625rem;
+  }
+  .pair dt { font-family: var(--display); font-style: italic; color: var(--flame); font-size: 1.25rem; line-height: 1.3; }
+  .pair dd { margin: 0; color: #D9CBBF; }
+
+  .video {
+    position: relative;
+    aspect-ratio: 9 / 16;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    background: #0E0A08;
+    box-shadow: 0 0 0 1px #F2601B33, 0 30px 80px -20px #F2601B55;
+  }
+  .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .video-poster { position: absolute; inset: 0; display: grid; place-items: center; }
+  .video-poster img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .8; transition: opacity .2s ease; }
+  .video-poster:hover img { opacity: 1; }
+  .play {
+    position: relative;
+    width: 4.5rem; height: 4.5rem;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    color: #2A1B05;
+    background: radial-gradient(circle at 35% 30%, #F7DC94, var(--gold) 60%, var(--gold-deep));
+    box-shadow: 0 0 0 6px #1E171488, 0 10px 40px #F2601B88;
+    transition: transform .2s ease;
+  }
+  .play svg { width: 1.9rem; height: 1.9rem; margin-left: .2rem; }
+  .video-poster:hover .play { transform: scale(1.06); }
+  .video-caption a { color: var(--smoke); }
+  .video-caption { margin-top: .9rem; font-size: .95rem; color: #8F7F73; text-align: center; }
+
+  /* ---------- The ring comes off ---------- */
+  .ring-off {
+    --p: 0;
+    position: relative;
+    height: 26rem;
+    background: linear-gradient(180deg, var(--ash-2) 0%, #5B4A33 45%, #B9C29A 75%, var(--meadow) 100%);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .falling-ring {
+    width: 7rem;
+    transform: translateY(calc(var(--p) * 9rem - 4.5rem)) rotateX(calc(var(--p) * 55deg)) rotate(calc(var(--p) * 25deg));
+    opacity: calc(1 - var(--p) * .35);
+    filter: drop-shadow(0 12px 20px #00000055);
+  }
+  .ring-off p {
+    position: absolute;
+    bottom: 2.2rem;
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(1.5rem, 3.2vw, 2.1rem);
+    color: var(--moss);
+    text-align: center;
+    padding-inline: 1.25rem;
+  }
+
+  /* ---------- The Shire: how it works ---------- */
+  .shire { background: var(--meadow); color: var(--moss); }
+  .shire section { padding: 6rem 0; }
+  .shire h2 { font-size: clamp(2.4rem, 5vw, 3.75rem); margin-bottom: 1.2rem; color: #22301A; }
+  .shire .intro { max-width: var(--measure); color: var(--moss-soft); }
+
+  .steps {
+    list-style: none;
+    padding: 0;
+    margin: 3rem 0 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2.5rem;
+    counter-reset: step;
+  }
+  .steps li { counter-increment: step; border-top: 2px solid var(--moss); padding-top: 1.1rem; }
+  .steps li::before {
+    content: counter(step);
+    display: block;
+    font-family: var(--display);
+    font-size: 3rem;
+    line-height: 1;
+    color: var(--door);
+    margin-bottom: .6rem;
+  }
+  .steps h3 { font-size: 1.75rem; margin-bottom: .55rem; color: #22301A; }
+  .steps p { color: var(--moss-soft); font-size: 1.0625rem; }
+
+  /* The app, drawn in HTML */
+  .tally { background: var(--meadow-2); }
+  .tally .wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: clamp(2.5rem, 7vw, 6rem);
+    align-items: center;
+  }
+  .facts { margin: 2rem 0 0; padding: 0; list-style: none; display: grid; gap: .65rem; max-width: var(--measure); }
+  .facts li { display: grid; grid-template-columns: 1.3rem 1fr; gap: .7rem; color: var(--moss-soft); font-size: 1.0625rem; }
+  .facts li::before {
+    content: "";
+    width: .7rem; height: .7rem;
+    margin-top: .45rem;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2.5px var(--gold-deep) inset;
+  }
+
+  .panel {
+    width: 300px;
+    padding: 16px;
+    border-radius: 14px;
+    background: #F6F6F4ee;
+    box-shadow: 0 0 0 .5px #00000033, 0 24px 60px -18px #2C3A2166, 0 2px 6px #0000001a;
+    font: 13px/1.35 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+    color: #1D1D1F;
+    display: grid;
+    gap: 18px;
+    transform: rotate(1.5deg);
+  }
+  .p-card {
+    padding: 14px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #F7873433, #F787340f);
+    box-shadow: 0 0 0 1px #F7873440 inset;
+    display: grid;
+    gap: 14px;
+  }
+  .p-row { display: flex; align-items: center; gap: 14px; }
+  .p-ring { width: 58px; height: 58px; flex: none; }
+  .p-state { color: #F78734; font-weight: 600; font-size: 14px; }
+  .p-count { font: 600 34px/1.05 ui-rounded, -apple-system, sans-serif; font-variant-numeric: tabular-nums; }
+  .p-sub { color: #86868B; font-size: 11px; }
+  .p-button {
+    text-align: center;
+    padding: 9px;
+    border-radius: 10px;
+    color: #fff;
+    font: 600 13px/1 ui-rounded, -apple-system, sans-serif;
+    background: linear-gradient(180deg, #F99A52, #F07A24);
+    box-shadow: 0 2px 6px #F7873459;
+  }
+  .p-today { display: grid; gap: 8px; padding-inline: 4px; }
+  .p-label { display: flex; justify-content: space-between; color: #86868B; font-size: 11px; }
+  .p-label b { font-weight: 600; font-size: 10px; letter-spacing: .08em; }
+  .p-total { font: 600 28px/1 ui-rounded, -apple-system, sans-serif; }
+  .p-total small { font-size: 13px; color: #86868B; font-weight: 500; }
+  .p-line { position: relative; height: 8px; border-radius: 4px; background: #0000000f; }
+  .p-line i { position: absolute; top: 0; height: 8px; border-radius: 4px; background: #F78734; }
+  .p-line .now { width: 2px; top: -3px; height: 14px; background: #1D1D1F88; }
+  .p-hours { display: flex; justify-content: space-between; font: 500 9px/1 ui-rounded, -apple-system, sans-serif; color: #AEAEB2; }
+  .p-menu { border-top: 1px solid #0000001a; padding-top: 8px; display: grid; gap: 1px; }
+  .p-menu div { display: flex; justify-content: space-between; padding: 6px 8px; border-radius: 7px; }
+  .p-menu div:first-child { background: #00000014; }
+  .p-menu span { color: #86868B; }
+
+  /* Install */
+  .install ol {
+    margin: 2.5rem 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: install;
+    display: grid;
+    gap: 1.6rem;
+    max-width: 42rem;
+  }
+  .install li { counter-increment: install; display: grid; grid-template-columns: 2.6rem 1fr; gap: 1rem; }
+  .install li::before {
+    content: counter(install);
+    width: 2.2rem; height: 2.2rem;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    font-family: var(--display);
+    font-size: 1.3rem;
+    color: var(--meadow);
+    background: var(--door);
+  }
+  .install li p { color: var(--moss-soft); }
+  .install li strong { color: #22301A; font-weight: 500; }
+  code {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: .85em;
+    padding: .15em .4em;
+    border-radius: .35em;
+    background: #2C3A2112;
+    color: #22301A;
+    overflow-wrap: anywhere;
+  }
+  .install .actions { justify-content: flex-start; margin-top: 2.5rem; }
+  .install .button-ghost { color: var(--moss); box-shadow: 0 0 0 1px #2C3A2155 inset; }
+  .install .button-ghost:hover { box-shadow: 0 0 0 1px #2C3A21aa inset; }
+
+  footer {
+    background: var(--meadow);
+    color: #7A866A;
+    font-size: .9rem;
+    padding: 2.5rem 0 3rem;
+    border-top: 1px solid #2C3A211f;
+  }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; }
+  footer p { max-width: 40rem; }
+
+  /* ---------- Small screens ---------- */
+  @media (max-width: 52rem) {
+    .ring-on .wrap, .tally .wrap { grid-template-columns: 1fr; }
+    .video-col { max-width: 20rem; margin-inline: auto; width: 100%; }
+    .steps { grid-template-columns: 1fr; gap: 2rem; }
+    .panel { transform: none; margin-inline: auto; }
+    .shire section, .ring-on { padding-block: 4.5rem; }
+  }
+  @media (max-width: 22rem) {
+    .panel { width: 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .eye { animation: none; }
+    .pupil { transition: none; }
+    .falling-ring { transform: none; opacity: 1; }
+    .button, .play, .video-poster img { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <a class="brand" href="#top" id="top" aria-label="Focus">
+    <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="22" fill="none" stroke="#D9AE52" stroke-width="9"/></svg>
+    Focus
+  </a>
+
+  <div class="hero-inner wrap">
+    <svg class="eye" viewBox="0 0 400 220" role="img" aria-label="A flaming eye, staring back">
+      <defs>
+        <radialGradient id="iris" cx="50%" cy="50%" r="55%">
+          <stop offset="0" stop-color="#FFF1C2"/>
+          <stop offset=".22" stop-color="#FFC765"/>
+          <stop offset=".5" stop-color="#F2601B"/>
+          <stop offset=".8" stop-color="#8E2408"/>
+          <stop offset="1" stop-color="#2A0A03"/>
+        </radialGradient>
+        <filter id="fire" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="fractalNoise" baseFrequency=".018 .09" numOctaves="3" seed="7">
+            <animate attributeName="seed" values="7;8;9;10;7" dur="1.6s" repeatCount="indefinite"/>
+          </feTurbulence>
+          <feDisplacementMap in="SourceGraphic" scale="26"/>
+        </filter>
+        <clipPath id="lid">
+          <path d="M14 110 C 110 4, 290 4, 386 110 C 290 216, 110 216, 14 110 Z"/>
+        </clipPath>
+      </defs>
+      <path d="M14 110 C 110 4, 290 4, 386 110 C 290 216, 110 216, 14 110 Z" fill="#F2601B" opacity=".35" filter="url(#fire)"/>
+      <g clip-path="url(#lid)">
+        <rect width="400" height="220" fill="url(#iris)" filter="url(#fire)"/>
+        <g class="pupil">
+          <ellipse cx="200" cy="110" rx="11" ry="84" fill="#120604"/>
+          <ellipse cx="200" cy="110" rx="22" ry="92" fill="#120604" opacity=".35"/>
+        </g>
+      </g>
+    </svg>
+
+    <h1>Stop staring into the Eye</h1>
+    <p class="lead">Focus is a small Mac app that blocks the sites that keep pulling you in. Take a short break when you need one. When it ends, the sites are blocked again and the Eye loses sight of you.</p>
+    <div class="actions">
+      <a class="button button-gold" href="https://github.com/kunstefix/focus/releases/latest/download/Focus.dmg">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m0 0-5-5m5 5 5-5M5 20h14"/></svg>
+        Download for macOS
+      </a>
+      <a class="button button-ghost" href="https://github.com/kunstefix/focus">View the source on GitHub</a>
+    </div>
+    <p class="fineprint">Free and open source. macOS 13 or later. Lives in your menu bar.</p>
+  </div>
+</header>
+
+<main>
+  <section class="ring-on" aria-labelledby="ring-on-title">
+    <div class="wrap">
+      <div>
+        <h2 id="ring-on-title">Every break is a ring you put on</h2>
+        <p>Five minutes on a feed feels harmless. Then the feed starts looking back, and an hour is gone.</p>
+        <p>Focus gives every break an end. When the time is up the sites go dark again, and your browser restarts so the tabs you left open lose their grip too.</p>
+        <dl class="pair">
+          <dt>Ring on</dt>
+          <dd>You start a break. The blocked sites open, and so does the Eye.</dd>
+          <dt>Ring off</dt>
+          <dd>The break ends on its own. You're back in the room, with your afternoon.</dd>
+        </dl>
+      </div>
+      <div class="video-col">
+        <div class="video" id="video">
+          <a class="video-poster" href="https://www.youtube.com/shorts/FQvCEuEW3lg" aria-label="Play the video: Frodo takes off the ring">
+            <img src="https://i.ytimg.com/vi/FQvCEuEW3lg/hq720.jpg" alt="" loading="lazy">
+            <span class="play" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>
+            </span>
+          </a>
+        </div>
+        <p class="video-caption">What the end of a break feels like. <a href="https://www.youtube.com/shorts/FQvCEuEW3lg">Watch on YouTube</a></p>
+      </div>
+    </div>
+  </section>
+
+  <div class="ring-off" id="ring-off" aria-hidden="true">
+    <svg class="falling-ring" viewBox="0 0 120 120">
+      <defs>
+        <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#FBE3A0"/>
+          <stop offset=".45" stop-color="#D9AE52"/>
+          <stop offset=".7" stop-color="#9C7224"/>
+          <stop offset="1" stop-color="#F0CF7A"/>
+        </linearGradient>
+      </defs>
+      <circle cx="60" cy="60" r="42" fill="none" stroke="url(#gold)" stroke-width="15"/>
+      <circle cx="60" cy="60" r="42" fill="none" stroke="#FFF6D8" stroke-width="1.5" stroke-dasharray="40 224" stroke-dashoffset="-20" opacity=".8"/>
+    </svg>
+    <p>The break ends. The ring comes off.</p>
+  </div>
+
+  <div class="shire">
+    <section aria-labelledby="how-title">
+      <div class="wrap">
+        <h2 id="how-title">How a break works</h2>
+        <p class="intro">Blocking is the normal state. A break is something you ask for, and it always runs out.</p>
+        <ol class="steps">
+          <li>
+            <h3>Block your list</h3>
+            <p>Install once and add the sites you reach for out of habit. They stay blocked, even after a restart.</p>
+          </li>
+          <li>
+            <h3>Ask for a break</h3>
+            <p>Pick 5, 10, 15 or 30 minutes and type your password. That small pause is often enough to change your mind.</p>
+          </li>
+          <li>
+            <h3>Let it end on its own</h3>
+            <p>When the time is up the sites are blocked again, even if your Mac was asleep. Your browser restarts, so tabs left open on them close too.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="tally" aria-labelledby="tally-title">
+      <div class="wrap">
+        <div>
+          <h2 id="tally-title">See how long you looked</h2>
+          <p class="intro">The menu bar shows a countdown during a break, and how much of today went to breaks. The habit is easier to change once you can see it.</p>
+          <ul class="facts">
+            <li><span>Blocks each site with and without www, over IPv4 and IPv6.</span></li>
+            <li><span>Works system-wide through <code>/etc/hosts</code>, not inside one browser.</span></li>
+            <li><span>Only touches its own section of that file and leaves your entries alone.</span></li>
+            <li><span>Ending a break early never needs a password.</span></li>
+          </ul>
+        </div>
+
+        <div class="panel" role="img" aria-label="The Focus menu during a break: 6 minutes 24 seconds left, 32 minutes on breaks today">
+          <div class="p-card">
+            <div class="p-row">
+              <svg class="p-ring" viewBox="0 0 58 58" aria-hidden="true">
+                <circle cx="29" cy="29" r="26.5" fill="none" stroke="#F787342e" stroke-width="5"/>
+                <circle cx="29" cy="29" r="26.5" fill="none" stroke="#F78734" stroke-width="5" stroke-linecap="round"
+                        stroke-dasharray="106.6 166.5" transform="rotate(-90 29 29)"/>
+                <path d="M21 25h13v6a5 5 0 0 1-5 5h-3a5 5 0 0 1-5-5zM34 27h2a2.5 2.5 0 0 1 0 5h-2.2M19 38.5h17" fill="none" stroke="#F78734" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <div>
+                <div class="p-state">On a break</div>
+                <div class="p-count">6:24</div>
+                <div class="p-sub">Blocking again at 16:42</div>
+              </div>
+            </div>
+            <div class="p-button">End break now</div>
+          </div>
+          <div class="p-today">
+            <div class="p-label"><b>TODAY ON BREAKS</b><span>4 breaks</span></div>
+            <div class="p-total">32 <small>min</small></div>
+            <div class="p-line">
+              <i style="left:38.3%;width:1.6%"></i>
+              <i style="left:47.9%;width:1.6%"></i>
+              <i style="left:58.7%;width:1.6%"></i>
+              <i style="left:66.2%;width:1.6%"></i>
+              <i class="now" style="left:68.4%"></i>
+            </div>
+            <div class="p-hours"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div>
+          </div>
+          <div class="p-menu">
+            <div>Blocked sites…<span>6</span></div>
+            <div>Open at login<span>✓</span></div>
+            <div>Quit Focus<span>⌘Q</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="install" id="install" aria-labelledby="install-title">
+      <div class="wrap">
+        <h2 id="install-title">Install</h2>
+        <ol>
+          <li><p><strong>Download Focus.dmg</strong> and drag Focus into Applications.</p></li>
+          <li><p><strong>Open it once.</strong> Focus isn't signed with an Apple Developer ID, so macOS blocks it the first time. Go to System Settings, then Privacy &amp; Security, and click Open Anyway. Or run <code>xattr -dr com.apple.quarantine /Applications/Focus.app</code> in Terminal.</p></li>
+          <li><p><strong>Click Install</strong> in the Focus window and enter your password. Your sites are blocked from then on.</p></li>
+        </ol>
+        <div class="actions">
+          <a class="button button-door" href="https://github.com/kunstefix/focus/releases/latest/download/Focus.dmg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m0 0-5-5m5 5 5-5M5 20h14"/></svg>
+            Download for macOS
+          </a>
+          <a class="button button-ghost" href="https://github.com/kunstefix/focus#command-line">Use it from the command line</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Focus is a personal project. It isn't affiliated with the Tolkien Estate, Middle-earth Enterprises or Warner Bros. The video is embedded from YouTube.</p>
+    <a href="https://github.com/kunstefix/focus">GitHub</a>
+  </div>
+</footer>
+
+<script>
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // The Eye follows the cursor
+  const eye = document.querySelector(".eye");
+  const pupil = document.querySelector(".pupil");
+  if (!reduceMotion && matchMedia("(pointer: fine)").matches) {
+    addEventListener("pointermove", (event) => {
+      const box = eye.getBoundingClientRect();
+      const dx = (event.clientX - (box.left + box.width / 2)) / innerWidth;
+      const dy = (event.clientY - (box.top + box.height / 2)) / innerHeight;
+      pupil.style.transform = `translate(${Math.max(-1, Math.min(1, dx * 2)) * 70}px, ${Math.max(-1, Math.min(1, dy * 2)) * 14}px)`;
+    });
+  }
+
+  // Load the YouTube player only when asked; the poster links to YouTube otherwise
+  const poster = document.querySelector(".video-poster");
+  poster.addEventListener("click", (event) => {
+    event.preventDefault();
+    const frame = document.createElement("iframe");
+    frame.src = "https://www.youtube-nocookie.com/embed/FQvCEuEW3lg?autoplay=1&rel=0&playsinline=1";
+    frame.title = "Frodo takes off the ring";
+    frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+    frame.referrerPolicy = "strict-origin-when-cross-origin";
+    frame.allowFullscreen = true;
+    poster.replaceWith(frame);
+    frame.focus();
+  });
+
+  // The ring falls as its band scrolls through the viewport
+  const band = document.getElementById("ring-off");
+  if (!reduceMotion) {
+    let queued = false;
+    const update = () => {
+      queued = false;
+      const box = band.getBoundingClientRect();
+      const progress = (innerHeight - box.top) / (innerHeight + box.height);
+      band.style.setProperty("--p", Math.max(0, Math.min(1, progress)).toFixed(3));
+    };
+    addEventListener("scroll", () => {
+      if (!queued) { queued = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    update();
+  }
+</script>
+</body>
+</html>

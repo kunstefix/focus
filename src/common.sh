@@ -1,10 +1,10 @@
 # Shared by the scripts in src/. Expects SCRIPT_DIR to be set.
 
 HOSTS_FILE="/etc/hosts"
-PID_FILE="/var/run/focus.pid"
+# "<start> <deadline> <user>" while a break runs; focusd.sh ends it at the deadline
 DEADLINE_FILE="/var/run/focus.deadline"
 # Root-only parents matter here: sudoers lets anyone run focus.sh as root
-LIB_DIR="/Library/PrivilegedHelperTools/com.klemen.focus"
+LIB_DIR="/Library/PrivilegedHelperTools/io.github.kunstefix.focus"
 CONFIG_FILE="$LIB_DIR/config"
 LOG_DIR="/var/db/focus"
 LOG_FILE="$LOG_DIR/breaks.log"
@@ -19,13 +19,13 @@ log_event() {
     echo "$*" >> "$LOG_FILE"
 }
 
-# Kill a pending re-focus timer started by unfocus.sh, if any
-cancel_timer() {
-    if [ -f "$PID_FILE" ]; then
-        kill "$(cat "$PID_FILE")" 2>/dev/null && log_event "end $(date +%s)"
-        rm -f "$PID_FILE"
-    fi
+# End the running break, if any. Sets ended_user to the user who took it.
+ended_user=""
+end_break() {
+    [ -f "$DEADLINE_FILE" ] || return 0
+    read -r _ _ ended_user < "$DEADLINE_FILE"
     rm -f "$DEADLINE_FILE"
+    log_event "end $(date +%s)"
 }
 
 # Print /etc/hosts without the focus block and without trailing blank lines
