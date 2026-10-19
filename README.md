@@ -14,9 +14,9 @@ Checking a site is usually a habit, not a decision. Focus puts a little friction
 
 ### Install
 
-1. Download `Focus.dmg` from the [releases](../../releases) and drag Focus to Applications.
+1. Download Focus from [Gumroad](https://kunstek5.gumroad.com/l/kgrrkg) (pay what you want, from €0) or from the [releases](../../releases), and drag Focus to Applications.
 2. Open it. The app isn't signed with an Apple Developer ID, so macOS blocks it the first time. Go to **System Settings → Privacy & Security** and click **Open Anyway**. Or run `xattr -dr com.apple.quarantine /Applications/Focus.app` once.
-3. Click the lock in the menu bar, then **Install**, and enter your password. This blocks the sites in your list now and at every boot.
+3. Click the ring in the menu bar, then **Install**, and enter your password. This blocks the sites in your list now and at every boot.
 
 ### Use
 

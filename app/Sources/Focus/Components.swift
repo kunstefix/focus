@@ -2,9 +2,10 @@ import FocusCore
 import SwiftUI
 
 enum Theme {
-    /// The app icon's indigo, for the blocked state
-    static let focus = Color(red: 0.40, green: 0.37, blue: 0.96)
-    /// Warm orange for breaks
+    /// The ring's gold, for the blocked state. Deeper than the icon's gold,
+    /// so white text on it stays readable.
+    static let focus = Color(red: 0.71, green: 0.52, blue: 0.17)
+    /// Warm orange for breaks, the Eye's fire
     static let onBreak = Color(red: 0.97, green: 0.53, blue: 0.20)
 }
 
@@ -131,14 +132,12 @@ struct MenuRow: View {
     }
 }
 
-/// A round, filled icon for the current state
+/// The ring mark in a filled circle, for the current state
 struct StateBadge: View {
-    let symbol: String
     let tint: Color
 
     var body: some View {
-        Image(systemName: symbol)
-            .font(.system(size: 18, weight: .semibold))
+        RingMark(size: 22)
             .foregroundStyle(.white)
             .frame(width: 44, height: 44)
             .background(Circle().fill(tint.gradient))
@@ -160,9 +159,10 @@ struct BreakRing: View {
                 .stroke(tint, style: StrokeStyle(lineWidth: 5, lineCap: .round))
                 .rotationEffect(.degrees(-90))
                 .animation(.linear(duration: 1), value: progress)
-            Image(systemName: "cup.and.saucer.fill")
-                .font(.system(size: 18))
-                .foregroundStyle(tint)
+            // The ring is on: the Eye looks out of it
+            PupilShape()
+                .fill(tint)
+                .frame(width: 13, height: 30)
         }
         .frame(width: 58, height: 58)
     }

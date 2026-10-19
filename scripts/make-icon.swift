@@ -1,4 +1,4 @@
-// Draws the app icon: a white lock on a rounded indigo square.
+// Draws the app icon: a glowing gold ring on a dark ash tile, like the landing page.
 // Usage: swift make-icon.swift <out.png>   (1024×1024)
 import AppKit
 
@@ -9,18 +9,43 @@ let bitmap = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: Int(size), pixe
                               colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
 NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: bitmap)
 
+func color(_ hex: Int) -> NSColor {
+    NSColor(red: CGFloat(hex >> 16 & 0xFF) / 255, green: CGFloat(hex >> 8 & 0xFF) / 255,
+            blue: CGFloat(hex & 0xFF) / 255, alpha: 1)
+}
+
 // macOS icons leave a margin around the rounded square
 let tile = NSRect(x: 100, y: 100, width: 824, height: 824)
-let gradient = NSGradient(starting: NSColor(red: 0.36, green: 0.33, blue: 0.95, alpha: 1),
-                          ending: NSColor(red: 0.18, green: 0.15, blue: 0.55, alpha: 1))!
-gradient.draw(in: NSBezierPath(roundedRect: tile, xRadius: 185, yRadius: 185), angle: -90)
+let tilePath = NSBezierPath(roundedRect: tile, xRadius: 185, yRadius: 185)
+NSGradient(starting: color(0x3A2B24), ending: color(0x1E1714))!.draw(in: tilePath, angle: -90)
 
-let config = NSImage.SymbolConfiguration(pointSize: 440, weight: .semibold)
-    .applying(NSImage.SymbolConfiguration(paletteColors: [.white]))
-let lock = NSImage(systemSymbolName: "lock.fill", accessibilityDescription: nil)!
-    .withSymbolConfiguration(config)!
-lock.draw(in: NSRect(x: (size - lock.size.width) / 2, y: (size - lock.size.height) / 2,
-                     width: lock.size.width, height: lock.size.height))
+// The ring: a band of 92 px, its outer edge 520 px across
+let band: CGFloat = 92
+let outer: CGFloat = 520
+let ringRect = NSRect(x: (size - outer) / 2, y: (size - outer) / 2, width: outer, height: outer)
+    .insetBy(dx: band / 2, dy: band / 2)
+let ring = NSBezierPath(ovalIn: ringRect)
+ring.lineWidth = band
+
+NSGraphicsContext.saveGraphicsState()
+tilePath.addClip()
+// Ember glow behind the ring
+let glow = NSShadow()
+glow.shadowColor = color(0xF2601B).withAlphaComponent(0.75)
+glow.shadowBlurRadius = 90
+glow.set()
+color(0xD9AE52).setStroke()
+ring.stroke()
+NSGraphicsContext.restoreGraphicsState()
+
+// Gold gradient along the band, light at the top left
+NSGraphicsContext.saveGraphicsState()
+let bandOutline = NSBezierPath(cgPath: ring.cgPath.copy(strokingWithWidth: band, lineCap: .butt,
+                                                        lineJoin: .miter, miterLimit: 10))
+bandOutline.addClip()
+NSGradient(starting: color(0xF4D58A), ending: color(0xB8862E))!.draw(in: ringRect.insetBy(dx: -band, dy: -band),
+                                                                    angle: -45)
+NSGraphicsContext.restoreGraphicsState()
 
 NSGraphicsContext.current?.flushGraphics()
 try! bitmap.representation(using: .png, properties: [:])!
