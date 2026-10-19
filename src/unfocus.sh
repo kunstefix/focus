@@ -18,26 +18,29 @@ if ! [[ "$minutes" =~ ^[1-9][0-9]*$ ]]; then
     exit 1
 fi
 
+# The installed daemon is what ends the break
+if [ ! -x "$LIB_DIR/focusd.sh" ]; then
+    echo "Error: Focus isn't installed. Run: sudo ./src/install.sh"
+    exit 1
+fi
+
 # Re-run as root, always asking for the password: -k ignores sudo's cached
 # credentials, so a recent sudo doesn't let a break start without a prompt.
 [ "$EUID" -eq 0 ] || exec sudo -k "$0" "$@"
 
 # A second unfocus restarts the countdown
-cancel_timer
+end_break
 
-cat "$BASE_HOSTS" > "$HOSTS_FILE"
+# Write the deadline before unblocking, so focusd.sh always ends the break.
+# The user is who restart-browser.sh runs as; the app runs this through
+# osascript, where SUDO_USER isn't set, and passes FOCUS_USER.
+now=$(date +%s)
+deadline=$(( now + minutes * 60 ))
+echo "$now $deadline ${SUDO_USER:-$FOCUS_USER}" > "$DEADLINE_FILE"
+log_event "start $now $deadline"
+
+hosts_without_block | replace_hosts
 flush_dns
-
-# Poll a wall-clock deadline instead of one long sleep, so time the
-# machine spends asleep still counts towards the break.
-deadline=$(( $(date +%s) + minutes * 60 ))
-nohup bash -c '
-    while [ "$(date +%s)" -lt "$1" ]; do sleep 5; done
-    rm -f "$2"
-    "$3/focus.sh"
-    exec "$3/restart-chrome.sh" "$4"
-' _ "$deadline" "$PID_FILE" "$SCRIPT_DIR" "$SUDO_USER" >/dev/null 2>&1 &
-echo $! > "$PID_FILE"
 
 echo "Focus off: sites are unblocked until $(date -r "$deadline" +%H:%M)."
 
