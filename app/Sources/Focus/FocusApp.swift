@@ -22,11 +22,36 @@ private struct MenuBarLabel: View {
 
     var body: some View {
         if let end = status.breakEnd {
-            Text("\(Image(systemName: "lock.open")) \(formatCountdown(until: end))")
-                .monospacedDigit()
+            Image(nsImage: countdownImage(formatCountdown(until: end)))
         } else {
             Image(systemName: "lock.fill")
         }
+    }
+
+    /// MenuBarExtra ignores frames and font features in its label, so the
+    /// countdown is drawn into an image. Its width is fixed, so the icons
+    /// beside it don't shift as the digits change.
+    private func countdownImage(_ countdown: String) -> NSImage {
+        let font = Font(NSFont.menuBarFont(ofSize: 0))
+        let content = HStack(spacing: 4) {
+            Image(systemName: "lock.open")
+            ZStack(alignment: .leading) {
+                // Sized for the widest countdown of up to 99 minutes
+                Text("00:00").hidden()
+                Text(countdown)
+            }
+        }
+        .font(font)
+        .monospacedDigit()
+        .foregroundStyle(.black)
+        .padding(.vertical, 1)
+
+        let renderer = ImageRenderer(content: content)
+        renderer.scale = NSScreen.main?.backingScaleFactor ?? 2
+        let image = renderer.nsImage ?? NSImage()
+        // A template image follows the menu bar's light or dark appearance
+        image.isTemplate = true
+        return image
     }
 }
 

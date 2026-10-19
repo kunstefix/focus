@@ -9,6 +9,8 @@ enum Paths {
     static let logFile = "/var/db/focus/breaks.log"
     // Before the app, install.sh passed the repo's sites.txt to this daemon
     static let daemonPlist = "/Library/LaunchDaemons/io.github.kunstefix.focus.plist"
+    // Must match install.sh; lets "End break now" run focus.sh without a password
+    static let sudoersFile = "/etc/sudoers.d/focus"
 
     static var sitesFile: URL {
         FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
@@ -62,8 +64,10 @@ final class FocusStatus: ObservableObject {
 
     func refresh() {
         let now = Date()
-        // focusd.sh is the newest script, so older installs show Install again
+        // focusd.sh is the newest script, so older installs show Install again.
+        // Without the sudoers rule, breaks can't be ended early, so that counts too.
         installed = FileManager.default.isExecutableFile(atPath: Paths.libDir + "/focusd.sh")
+            && FileManager.default.fileExists(atPath: Paths.sudoersFile)
         let deadline = Self.readDeadline().flatMap { $0.end > now ? $0 : nil }
         breakStart = deadline?.start
         breakEnd = deadline?.end
