@@ -23,6 +23,14 @@ enum PreviewRenderer {
             }
             write(SitesWindow(list: sites).environmentObject(FocusStatus.preview()), scheme: scheme,
                   to: directory, name: "sites")
+            let menuBar = HStack(spacing: 24) {
+                ForEach([nil, "4:07"], id: \.self) { countdown in
+                    Image(nsImage: menuBarImage(countdown: countdown))
+                        .renderingMode(.template)
+                        .foregroundStyle(.primary)
+                }
+            }
+            write(menuBar.padding(.horizontal, 16).frame(height: 24), scheme: scheme, to: directory, name: "menubar")
         }
     }
 

@@ -44,7 +44,7 @@ struct MenuView: View {
 
     private var focusedCard: some View {
         HStack(spacing: 12) {
-            StateBadge(symbol: "lock.fill", tint: Theme.focus)
+            StateBadge(tint: Theme.focus)
             VStack(alignment: .leading, spacing: 2) {
                 Text("Focused")
                     .font(.system(.title3, design: .rounded).weight(.semibold))
@@ -87,7 +87,7 @@ struct MenuView: View {
     private var installCard: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 12) {
-                StateBadge(symbol: "lock.shield.fill", tint: Theme.focus)
+                StateBadge(tint: Theme.focus)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Set up Focus")
                         .font(.system(.title3, design: .rounded).weight(.semibold))

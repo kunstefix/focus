@@ -115,6 +115,7 @@
   }
   .actions { display: flex; flex-wrap: wrap; gap: .8rem; justify-content: center; }
   .fineprint { font-size: .95rem; color: #8F7F73; }
+  .fineprint a { color: #CDBFA8; text-underline-offset: .15em; }
 
   .brand {
     position: absolute;
@@ -412,13 +413,13 @@
     <h1>Stop staring into the void</h1>
     <p class="lead">Focus is a small Mac app that blocks the sites that keep pulling you in. Take a short break when you need one. When it ends, the sites are blocked again and the Eye loses sight of you.</p>
     <div class="actions">
-      <a class="button button-gold" href="https://github.com/kunstefix/focus/releases/latest/download/Focus.dmg">
+      <a class="button button-gold" href="https://kunstek5.gumroad.com/l/kgrrkg">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m0 0-5-5m5 5 5-5M5 20h14"/></svg>
         Download for macOS
       </a>
       <a class="button button-ghost" href="https://github.com/kunstefix/focus">View the source on GitHub</a>
     </div>
-    <p class="fineprint">Free and open source. macOS 13 or later. Lives in your menu bar.</p>
+    <p class="fineprint">Pay what you want, from €0. Open source, so you can also <a href="https://github.com/kunstefix/focus/releases/latest/download/Focus.dmg">download it from GitHub</a>. macOS 13 or later.</p>
   </div>
 </header>
 
@@ -508,7 +509,7 @@
                 <circle cx="29" cy="29" r="26.5" fill="none" stroke="#F787342e" stroke-width="5"/>
                 <circle cx="29" cy="29" r="26.5" fill="none" stroke="#F78734" stroke-width="5" stroke-linecap="round"
                         stroke-dasharray="106.6 166.5" transform="rotate(-90 29 29)"/>
-                <path d="M21 25h13v6a5 5 0 0 1-5 5h-3a5 5 0 0 1-5-5zM34 27h2a2.5 2.5 0 0 1 0 5h-2.2M19 38.5h17" fill="none" stroke="#F78734" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M29 14Q35.5 29 29 44Q22.5 29 29 14Z" fill="#F78734"/>
               </svg>
               <div>
                 <div class="p-state">On a break</div>
@@ -543,12 +544,12 @@
       <div class="wrap">
         <h2 id="install-title">Install</h2>
         <ol>
-          <li><p><strong>Download Focus.dmg</strong> and drag Focus into Applications.</p></li>
+          <li><p><strong>Download Focus</strong> from Gumroad, at a price you choose, or free. Open Focus.dmg and drag Focus into Applications.</p></li>
           <li><p><strong>Open it once.</strong> Focus isn't signed with an Apple Developer ID, so macOS blocks it the first time. Go to System Settings, then Privacy &amp; Security, and click Open Anyway. Or run <code>xattr -dr com.apple.quarantine /Applications/Focus.app</code> in Terminal.</p></li>
           <li><p><strong>Click Install</strong> in the Focus window and enter your password. Your sites are blocked from then on.</p></li>
         </ol>
         <div class="actions">
-          <a class="button button-door" href="https://github.com/kunstefix/focus/releases/latest/download/Focus.dmg">
+          <a class="button button-door" href="https://kunstek5.gumroad.com/l/kgrrkg">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m0 0-5-5m5 5 5-5M5 20h14"/></svg>
             Download for macOS
           </a>
@@ -611,5 +612,7 @@
     update();
   }
 </script>
+<!-- Opens Gumroad checkout in an overlay for links to the product, instead of leaving the page -->
+<script src="https://gumroad.com/js/gumroad.js"></script>
 </body>
 </html>
